@@ -96,6 +96,13 @@ export default function DashboardPage() {
             </Card>
           </div>
         </section>
+
+        <p className="mt-12 border-t border-slate-200 pt-4 text-xs leading-relaxed text-slate-500">
+          This learning material was made with the support of AI. It is intended
+          for education and training only and should not be used for clinical
+          decision-making. Always follow local NHS guidance, validated service
+          processes, and professional supervision.
+        </p>
       </PageContainer>
     </main>
   );
