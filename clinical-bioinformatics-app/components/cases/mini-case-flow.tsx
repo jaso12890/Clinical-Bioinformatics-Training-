@@ -1,7 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import { Card } from "@/components/ui/card";
+
+type TextSection = {
+  title: string;
+  body: string;
+};
 
 type MiniCaseStep = {
   title: string;
@@ -13,13 +18,90 @@ type MiniCaseStep = {
 };
 
 type MiniCaseFlowProps = {
+  introSections?: TextSection[];
+  caseScenario?: TextSection;
+  learnerTask?: TextSection;
   steps: MiniCaseStep[];
-  conclusion: string[];
+  shortWrittenResponseTask?: TextSection;
+  strongAnswer?: TextSection;
+  whatThisMiniCaseIsTesting?: TextSection;
+  goodPerformanceLooksLike?: TextSection;
+  conclusion?: string[];
 };
 
+function renderInlineFormatting(text: string): ReactNode[] {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    return part;
+  });
+}
+
+function renderRichText(body: string) {
+  const blocks = body
+    .split("\n\n")
+    .map((block) => block.trim())
+    .filter(Boolean);
+
+  return blocks.map((block, index) => {
+    const lines = block
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    const isBulletList =
+      lines.length > 0 &&
+      lines.every((line) => line.startsWith("• ") || line.startsWith("- "));
+
+    if (isBulletList) {
+      return (
+        <ul key={index} className="list-disc pl-6 text-slate-700">
+          {lines.map((line, lineIndex) => (
+            <li key={lineIndex} className="mb-3 last:mb-0 leading-8">
+              {renderInlineFormatting(line.replace(/^([•-])\s+/, ""))}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+
+    return (
+      <p key={index} className="leading-8 text-slate-700">
+        {lines.map((line, lineIndex) => (
+          <span key={lineIndex}>
+            {renderInlineFormatting(line)}
+            {lineIndex < lines.length - 1 ? " " : null}
+          </span>
+        ))}
+      </p>
+    );
+  });
+}
+
+function SectionCard({ section }: { section: TextSection }) {
+  return (
+    <Card>
+      <h3 className="text-xl font-semibold">{section.title}</h3>
+
+      <div className="mt-4 space-y-4">{renderRichText(section.body)}</div>
+    </Card>
+  );
+}
+
 export function MiniCaseFlow({
+  introSections = [],
+  caseScenario,
+  learnerTask,
   steps,
-  conclusion
+  shortWrittenResponseTask,
+  strongAnswer,
+  whatThisMiniCaseIsTesting,
+  goodPerformanceLooksLike,
+  conclusion = []
 }: MiniCaseFlowProps) {
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>(
@@ -63,6 +145,17 @@ export function MiniCaseFlow({
 
   return (
     <div className="space-y-6">
+      {introSections.map((section, index) => (
+        <SectionCard
+          key={`${section.title}-${index}`}
+          section={section}
+        />
+      ))}
+
+      {caseScenario ? <SectionCard section={caseScenario} /> : null}
+
+      {learnerTask ? <SectionCard section={learnerTask} /> : null}
+
       <Card>
         <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
           Step {currentStepIndex + 1} of {steps.length}
@@ -70,13 +163,15 @@ export function MiniCaseFlow({
 
         <h2 className="mt-2 text-2xl font-semibold">{currentStep.title}</h2>
 
-        <div className="mt-4 space-y-4">
-          {currentStep.content.map((paragraph, index) => (
-            <p key={index} className="leading-8 text-slate-700">
-              {paragraph}
-            </p>
-          ))}
-        </div>
+        {currentStep.content.length > 0 ? (
+          <div className="mt-4 space-y-4">
+            {currentStep.content.map((paragraph, index) => (
+              <p key={index} className="leading-8 text-slate-700">
+                {renderInlineFormatting(paragraph)}
+              </p>
+            ))}
+          </div>
+        ) : null}
       </Card>
 
       <Card>
@@ -145,22 +240,41 @@ export function MiniCaseFlow({
         {isAnswered ? (
           <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
             <p className="font-semibold">{isCorrect ? "Correct." : "Not quite."}</p>
-            <p className="mt-1">{currentStep.explanation}</p>
+            <p className="mt-1 leading-8">{currentStep.explanation}</p>
           </div>
         ) : null}
       </Card>
 
       {showConclusion ? (
-        <Card>
-          <h3 className="text-xl font-semibold">Case summary</h3>
-          <div className="mt-4 space-y-4">
-            {conclusion.map((paragraph, index) => (
-              <p key={index} className="leading-8 text-slate-700">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </Card>
+        <>
+          {conclusion.length > 0 ? (
+            <Card>
+              <h3 className="text-xl font-semibold">Case summary</h3>
+
+              <div className="mt-4 space-y-4">
+                {conclusion.map((paragraph, index) => (
+                  <p key={index} className="leading-8 text-slate-700">
+                    {renderInlineFormatting(paragraph)}
+                  </p>
+                ))}
+              </div>
+            </Card>
+          ) : null}
+
+          {shortWrittenResponseTask ? (
+            <SectionCard section={shortWrittenResponseTask} />
+          ) : null}
+
+          {strongAnswer ? <SectionCard section={strongAnswer} /> : null}
+
+          {whatThisMiniCaseIsTesting ? (
+            <SectionCard section={whatThisMiniCaseIsTesting} />
+          ) : null}
+
+          {goodPerformanceLooksLike ? (
+            <SectionCard section={goodPerformanceLooksLike} />
+          ) : null}
+        </>
       ) : null}
     </div>
   );

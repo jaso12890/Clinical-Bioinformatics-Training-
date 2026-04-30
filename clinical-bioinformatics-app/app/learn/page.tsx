@@ -20,7 +20,8 @@ export default function LearnPage() {
               title={module.title}
               description={module.description}
               lessons={module.lessons.map((lesson) => ({
-                slug: lesson.slug
+                slug: lesson.slug,
+                quiz: "quiz" in lesson ? lesson.quiz : undefined,
               }))}
             />
           ))}

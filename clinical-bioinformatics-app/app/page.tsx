@@ -1,38 +1,101 @@
 import Link from "next/link";
 import { PageContainer } from "@/components/layout/page-container";
+import { SectionHeading } from "@/components/ui/section-heading";
+import { DashboardProgress } from "@/components/learn/dashboard-progress";
 import { Card } from "@/components/ui/card";
 
-export default function HomePage() {
+export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <PageContainer className="flex flex-col gap-6">
-        <Card>
-          <p className="text-sm font-semibold uppercase tracking-wide text-slate-500">
-            Clinical Bioinformatics Genomics
-          </p>
-          <h1 className="mt-2 text-4xl font-bold">
-            Beginner learning app for STP Clinical Bioinformatics
-          </h1>
-          <p className="mt-4 max-w-2xl text-lg text-slate-600">
-            Learn the role, NHS context, patient safety, and genomics foundations
-            step by step.
-          </p>
+      <PageContainer>
+        <SectionHeading
+          title="Dashboard"
+          description="Track your progress and continue your learning journey."
+        />
 
-          <div className="mt-6 flex gap-4">
-            <Link
-              href="/dashboard"
-              className="rounded-xl bg-slate-900 px-5 py-3 text-white"
-            >
-              Go to Dashboard
-            </Link>
-            <Link
-              href="/learn"
-              className="rounded-xl border border-slate-300 px-5 py-3"
-            >
-              Start Learning
-            </Link>
+        <DashboardProgress />
+
+        <section className="mt-10">
+          <div>
+            <h2 className="text-2xl font-semibold">Training areas</h2>
+            <p className="mt-2 text-slate-600">
+              Move between structured learning, case reasoning, genomic evidence
+              exploration, and visual genomic context.
+            </p>
           </div>
-        </Card>
+
+          <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <Card className="border-slate-200 bg-white">
+              <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                Phase 2
+              </p>
+
+              <h3 className="mt-2 text-xl font-semibold">
+                Clinical Case Simulator
+              </h3>
+
+              <p className="mt-3 leading-7 text-slate-600">
+                Practise NHS-style clinical bioinformatics reasoning using
+                static handcrafted cases.
+              </p>
+
+              <div className="mt-5">
+                <Link
+                  href="/cases"
+                  className="inline-block rounded-xl bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800"
+                >
+                  Open cases
+                </Link>
+              </div>
+            </Card>
+
+            <Card className="border-slate-200 bg-white">
+              <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                Phase 3
+              </p>
+
+              <h3 className="mt-2 text-xl font-semibold">Genomic Explorer</h3>
+
+              <p className="mt-3 leading-7 text-slate-600">
+                Explore real genomic information in a simplified,
+                learner-friendly format.
+              </p>
+
+              <div className="mt-5">
+                <Link
+                  href="/explore"
+                  className="inline-block rounded-xl bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800"
+                >
+                  Open explorer
+                </Link>
+              </div>
+            </Card>
+
+            <Card className="border-slate-200 bg-white">
+              <p className="text-sm font-medium uppercase tracking-wide text-slate-500">
+                Phase 4
+              </p>
+
+              <h3 className="mt-2 text-xl font-semibold">
+                Genomic Visualisation
+              </h3>
+
+              <p className="mt-3 leading-7 text-slate-600">
+                Turn genomic coordinates, genes, transcripts, exons, and variant
+                positions into a simple visual model.
+              </p>
+
+              <div className="mt-5">
+                <Link
+                  href="/visualise"
+                  className="inline-block rounded-xl bg-slate-900 px-4 py-2 text-white transition hover:bg-slate-800"
+                >
+                  Open visualise
+                </Link>
+              </div>
+            </Card>
+          </div>
+        </section>
       </PageContainer>
     </main>
   );

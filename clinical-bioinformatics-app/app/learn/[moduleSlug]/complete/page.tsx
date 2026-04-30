@@ -19,7 +19,9 @@ export default async function ModuleCompletePage({ params }: PageProps) {
     notFound();
   }
 
-  const currentModuleIndex = modules.findIndex((module) => module.slug === moduleSlug);
+  const currentModuleIndex = modules.findIndex(
+    (module) => module.slug === moduleSlug
+  );
   const nextModule = modules[currentModuleIndex + 1];
 
   let understandingText = "";
@@ -49,8 +51,7 @@ export default async function ModuleCompletePage({ params }: PageProps) {
         <Card className="mt-8">
           <h2 className="text-xl font-semibold">What you’ve now completed</h2>
           <ul className="mt-4 list-disc space-y-2 pl-6 text-slate-700">
-            <li>All lesson screens in this module</li>
-            <li>The lesson glossaries</li>
+            <li>All lesson content in this module</li>
             <li>The module quiz</li>
             <li>The mini case</li>
           </ul>
@@ -64,13 +65,6 @@ export default async function ModuleCompletePage({ params }: PageProps) {
         <Card className="mt-6">
           <h2 className="text-xl font-semibold">Review this module</h2>
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link
-              href={`/learn/${moduleSlug}/glossary`}
-              className="rounded-xl border border-slate-300 px-4 py-2"
-            >
-              Module Glossary
-            </Link>
-
             <Link
               href={`/learn/${moduleSlug}/quiz`}
               className="rounded-xl border border-slate-300 px-4 py-2"

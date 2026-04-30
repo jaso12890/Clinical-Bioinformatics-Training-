@@ -1,40 +1,54 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  getProgress,
+  markMiniCaseComplete,
+  markModuleQuizComplete,
+} from "@/lib/progress";
 
 type ModuleItemCompleteButtonProps = {
-  storageKey: string;
+  moduleSlug: string;
+  itemType: "moduleQuiz" | "miniCase";
   completeLabel: string;
   incompleteLabel: string;
 };
 
 export function ModuleItemCompleteButton({
-  storageKey,
+  moduleSlug,
+  itemType,
   completeLabel,
-  incompleteLabel
+  incompleteLabel,
 }: ModuleItemCompleteButtonProps) {
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(storageKey);
-    setIsComplete(saved === "complete");
-  }, [storageKey]);
+    const progress = getProgress();
 
-  function toggleComplete() {
-    const nextValue = !isComplete;
-    setIsComplete(nextValue);
-
-    if (nextValue) {
-      window.localStorage.setItem(storageKey, "complete");
-    } else {
-      window.localStorage.removeItem(storageKey);
+    if (itemType === "moduleQuiz") {
+      setIsComplete(progress.completedModuleQuizzes.includes(`${moduleSlug}-quiz`));
+      return;
     }
+
+    setIsComplete(progress.completedMiniCases.includes(`${moduleSlug}-mini-case`));
+  }, [moduleSlug, itemType]);
+
+  function handleComplete() {
+    if (isComplete) return;
+
+    if (itemType === "moduleQuiz") {
+      markModuleQuizComplete(moduleSlug);
+    } else {
+      markMiniCaseComplete(moduleSlug);
+    }
+
+    setIsComplete(true);
   }
 
   return (
     <button
       type="button"
-      onClick={toggleComplete}
+      onClick={handleComplete}
       className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
         isComplete
           ? "border border-green-300 bg-green-100 text-green-800"

@@ -1,39 +1,47 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getProgress, markLessonComplete } from "@/lib/progress";
 
 type LessonProgressButtonProps = {
   lessonKey: string;
 };
 
 export function LessonProgressButton({
-  lessonKey
+  lessonKey,
 }: LessonProgressButtonProps) {
   const [isComplete, setIsComplete] = useState(false);
 
   useEffect(() => {
-    const saved = window.localStorage.getItem(`lesson-progress:${lessonKey}`);
-    setIsComplete(saved === "complete");
+    const [moduleSlug, lessonSlug] = lessonKey.split(":");
+
+    if (!moduleSlug || !lessonSlug) {
+      setIsComplete(false);
+      return;
+    }
+
+    const progress = getProgress();
+    const lessonId = `${moduleSlug}-${lessonSlug}`;
+
+    setIsComplete(progress.completedLessons.includes(lessonId));
   }, [lessonKey]);
 
-  function toggleComplete() {
-    const nextValue = !isComplete;
-    setIsComplete(nextValue);
+  function handleComplete() {
+    const [moduleSlug, lessonSlug] = lessonKey.split(":");
 
-    if (nextValue) {
-      window.localStorage.setItem(`lesson-progress:${lessonKey}`, "complete");
-    } else {
-      window.localStorage.removeItem(`lesson-progress:${lessonKey}`);
-    }
+    if (!moduleSlug || !lessonSlug) return;
+
+    markLessonComplete(moduleSlug, lessonSlug);
+    setIsComplete(true);
   }
 
   return (
     <button
       type="button"
-      onClick={toggleComplete}
+      onClick={handleComplete}
       className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
         isComplete
-          ? "bg-green-100 text-green-800 border border-green-300"
+          ? "border border-green-300 bg-green-100 text-green-800"
           : "bg-slate-900 text-white"
       }`}
     >

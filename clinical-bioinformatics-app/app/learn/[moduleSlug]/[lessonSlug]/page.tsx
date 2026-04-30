@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { SectionHeading } from "@/components/ui/section-heading";
 import { LessonQuiz } from "@/components/quiz/lesson-quiz";
 import { LessonProgressButton } from "@/components/learn/lesson-progress-button";
-import { LessonScreens } from "@/components/learn/lesson-screens";
+import LessonScreens from "@/components/learn/lesson-screens";
 
 type PageProps = {
   params: Promise<{
@@ -60,15 +60,6 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
   const currentScreen =
     !Number.isNaN(parsedScreen) && parsedScreen >= 1 ? parsedScreen : 1;
 
-  const returnTo = encodeURIComponent(
-    `/learn/${moduleSlug}/${lessonSlug}${hasScreens ? `?screen=${currentScreen}` : ""}`
-  );
-
-  const glossaryHref =
-    moduleSlug === "module-1" || moduleSlug === "module-2"
-      ? `/learn/${moduleSlug}/${lessonSlug}/glossary?returnTo=${returnTo}`
-      : `/learn/${moduleSlug}/glossary?returnTo=${returnTo}`;
-
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <PageContainer className="max-w-3xl">
@@ -89,17 +80,10 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
           </p>
         </Card>
 
-        <div className="mt-4 flex flex-wrap gap-3">
-          <Link
-            href={glossaryHref}
-            className="rounded-xl border border-slate-300 px-4 py-2"
-          >
-            Glossary
-          </Link>
-        </div>
-
         {hasScreens ? (
           <LessonScreens
+            moduleSlug={moduleSlug}
+            lessonSlug={lessonSlug}
             screens={lesson.screens!}
             quizQuestions={hasQuiz ? lesson.quiz! : undefined}
             initialScreen={currentScreen}
@@ -117,7 +101,11 @@ export default async function LessonPage({ params, searchParams }: PageProps) {
 
         {!hasScreens && hasQuiz ? (
           <div className="mt-8">
-            <LessonQuiz questions={lesson.quiz!} />
+            <LessonQuiz
+              moduleSlug={moduleSlug}
+              lessonSlug={lessonSlug}
+              questions={lesson.quiz!}
+            />
           </div>
         ) : null}
 

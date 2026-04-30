@@ -14,55 +14,87 @@ type QuizQuestion = {
   question: string;
   options: string[];
   answerIndex: number;
+  explanation?: string;
 };
 
 type LessonScreensProps = {
+  moduleSlug: string;
+  lessonSlug: string;
   screens: Screen[];
   quizQuestions?: QuizQuestion[];
   initialScreen?: number;
 };
 
+function renderInline(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/g).filter(Boolean);
+
+  return parts.map((part, index) => {
+    const isBold = part.startsWith("**") && part.endsWith("**");
+
+    if (isBold) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+
+    return part;
+  });
+}
+
+function isBulletBlock(paragraph: string) {
+  const lines = paragraph
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  return (
+    lines.length > 0 &&
+    lines.every(
+      (line) =>
+        line.startsWith("• ") ||
+        line.startsWith("- ") ||
+        line.startsWith("* ")
+    )
+  );
+}
+
 function renderBody(body: string) {
-  const paragraphs = body.split("\n\n");
+  const paragraphs = body
+    .split(/\n\s*\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
 
   return paragraphs.map((paragraph, index) => {
-    const lines = paragraph
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
+    if (isBulletBlock(paragraph)) {
+      const items = paragraph
+        .split("\n")
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => line.replace(/^[•*-]\s+/, ""));
 
-    const isList =
-      lines.length > 1 &&
-      lines.every(
-        (line) =>
-          !line.endsWith(".") &&
-          !line.endsWith("?") &&
-          !line.endsWith("!") &&
-          !line.includes(":")
-      );
-
-    if (isList) {
       return (
         <ul key={index} className="list-disc space-y-2 pl-6 text-slate-700">
-          {lines.map((line, lineIndex) => (
-            <li key={lineIndex}>{line}</li>
+          {items.map((item, itemIndex) => (
+            <li key={itemIndex} className="leading-8">
+              {renderInline(item)}
+            </li>
           ))}
         </ul>
       );
     }
 
     return (
-      <p key={index} className="leading-8 text-slate-700">
-        {lines.join(" ")}
+      <p key={index} className="whitespace-pre-line leading-8 text-slate-700">
+        {renderInline(paragraph)}
       </p>
     );
   });
 }
 
-export function LessonScreens({
+export default function LessonScreens({
+  moduleSlug,
+  lessonSlug,
   screens,
   quizQuestions,
-  initialScreen = 1
+  initialScreen = 1,
 }: LessonScreensProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -138,7 +170,11 @@ export function LessonScreens({
 
       {isLast && quizQuestions && quizQuestions.length > 0 ? (
         <div className="mt-8">
-          <LessonQuiz questions={quizQuestions} />
+          <LessonQuiz
+            moduleSlug={moduleSlug}
+            lessonSlug={lessonSlug}
+            questions={quizQuestions}
+          />
         </div>
       ) : null}
     </div>

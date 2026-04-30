@@ -19,49 +19,29 @@ export default async function ModulePage({ params }: PageProps) {
     notFound();
   }
 
+  const moduleIndex = modules.findIndex((module) => module.slug === moduleSlug);
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      <PageContainer className="max-w-4xl">
+      <PageContainer className="max-w-5xl">
         <Link href="/learn" className="text-sm text-slate-500">
           ← Back to Learn
         </Link>
 
         <div className="mt-6">
           <SectionHeading
-            eyebrow="Module"
+            eyebrow={`Module ${moduleIndex + 1}`}
             title={moduleData.title}
             description={moduleData.description}
           />
-        </div>
-
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            href={`/learn/${moduleSlug}/glossary`}
-            className="rounded-xl border border-slate-300 px-4 py-2"
-          >
-            Glossary
-          </Link>
-
-          <Link
-            href={`/learn/${moduleSlug}/quiz`}
-            className="rounded-xl border border-slate-300 px-4 py-2"
-          >
-            Module Quiz
-          </Link>
-
-          <Link
-            href={`/learn/${moduleSlug}/case`}
-            className="rounded-xl border border-slate-300 px-4 py-2"
-          >
-            Mini Case
-          </Link>
         </div>
 
         <ModuleProgress
           moduleSlug={moduleSlug}
           lessons={moduleData.lessons.map((lesson) => ({
             slug: lesson.slug,
-            title: lesson.title
+            title: lesson.title,
+            quiz: "quiz" in lesson ? lesson.quiz : undefined,
           }))}
         />
       </PageContainer>
